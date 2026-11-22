@@ -65,6 +65,30 @@
     }
   })();
 
+  /* ---------- Scroll reveal (aparição gradual) ---------- */
+  (function () {
+    var sel = '.hero__text, .hero__photo, .section__title, .section__lead, .card, .carousel, .thumbs, .mod, .board';
+    var els = Array.prototype.slice.call(document.querySelectorAll(sel));
+    function show(el) {
+      el.classList.add('in');
+      setTimeout(function () { el.style.transitionDelay = ''; }, 1300);
+    }
+    if (!('IntersectionObserver' in window)) { els.forEach(show); return; }
+    els.forEach(function (el) {
+      if (el.matches('.card, .mod, .board')) {            // entrada escalonada nos grupos de cards
+        var group = Array.prototype.filter.call(el.parentNode.children, function (n) { return n.className === el.className; });
+        el.style.transitionDelay = Math.min(group.indexOf(el), 4) * 90 + 'ms';
+      }
+      el.classList.add('reveal');
+    });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { show(en.target); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  })();
+
   /* ---------- Carrossel ---------- */
   var viewport = document.getElementById('carViewport');
   var track = document.getElementById('carTrack');
