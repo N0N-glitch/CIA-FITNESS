@@ -97,7 +97,8 @@
       b.type = 'button';
       b.setAttribute('aria-label', 'Ir para ' + s.dataset.title);
       if (c !== 1) { b.tabIndex = -1; b.setAttribute('aria-hidden', 'true'); }
-      b.innerHTML = '<svg><use href="#i-photo"/></svg><span>' + s.dataset.title + '</span>';
+      var im = s.querySelector('img');
+      b.innerHTML = '<img src="' + (im ? im.getAttribute('src') : '') + '" alt="" draggable="false" decoding="async"><span>' + s.dataset.title + '</span>';
       b.addEventListener('click', function () { go(i + 1); });
       strip.appendChild(b);
       allThumbs.push(b);
