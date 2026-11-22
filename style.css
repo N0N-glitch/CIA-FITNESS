@@ -202,3 +202,14 @@ img,svg,table{max-width:100%}
 .actions{display:grid;gap:12px}
 .actions .btn{justify-content:flex-start;gap:12px;padding-inline:22px}
 .actions .btn svg{width:22px;height:22px;flex-shrink:0}
+
+/* ---- Imagens reais ---- */
+.hero__photo{position:relative;min-width:0;width:100%;aspect-ratio:4/5;max-height:560px;border-radius:20px;overflow:hidden;border:1px solid rgba(245,183,0,.55);background:linear-gradient(160deg,var(--surface2),var(--surface));box-shadow:0 0 0 1px rgba(245,183,0,.08),0 0 38px rgba(245,183,0,.22),0 24px 60px rgba(0,0,0,.6)}
+.hero__photo img{display:block;width:100%;height:100%;object-fit:cover}
+.hero__photo::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 40px rgba(0,0,0,.45);pointer-events:none}
+@media (max-width:980px){.hero__photo{aspect-ratio:16/10;max-height:none}}
+.slide{background:linear-gradient(160deg,var(--surface2),var(--surface))}
+.slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.thumb{position:relative;overflow:hidden;padding:0;border:1.5px solid rgba(212,175,55,.3);background:var(--surface2)}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+.thumb span{position:absolute;inset:auto 0 0 0;padding:20px 8px 8px;background:linear-gradient(to top,rgba(0,0,0,.88),transparent);color:#fff;font-size:.78rem;line-height:1.2}
