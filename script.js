@@ -19,16 +19,32 @@
     a.addEventListener('click', function () { setMenu(false); });
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setMenu(false); });
-  window.addEventListener('resize', function () { if (window.innerWidth > 820) setMenu(false); });
+  window.addEventListener('resize', function () { if (window.innerWidth > 1040) setMenu(false); });
 
-  /* ---------- Ano ---------- */
   var year = document.getElementById('year');
   if (year) year.textContent = new Date().getFullYear();
 
-  /* ---------- Horários: destaca o dia e mostra aberto/fechado (horário de Rondônia) ---------- */
+  /* ---------- Horários: seletor deslizante ---------- */
+  var seg = document.getElementById('seg');
+  var btns = seg.querySelectorAll('.seg__btn');
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var i = Number(b.dataset.i);
+      seg.dataset.active = i;                       // o CSS desliza o indicador
+      btns.forEach(function (x) {
+        var on = x === b;
+        x.classList.toggle('active', on);
+        x.setAttribute('aria-selected', String(on));
+      });
+      document.getElementById('view0').classList.toggle('active', i === 0);
+      document.getElementById('view1').classList.toggle('active', i === 1);
+    });
+  });
+
+  /* ---------- Horários: dia atual e aberto/fechado (horário de Rondônia) ---------- */
   (function () {
     var status = document.getElementById('status');
-    var rows = document.querySelectorAll('#hours tr');
+    var items = document.querySelectorAll('[data-days]');
     try {
       var parts = new Intl.DateTimeFormat('en-US', {
         timeZone: 'America/Porto_Velho', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false
@@ -37,10 +53,10 @@
       var day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
       var mins = (parseInt(get('hour'), 10) % 24) * 60 + parseInt(get('minute'), 10);
       var open = false;
-      rows.forEach(function (tr) {
-        if (tr.dataset.days.split(',').map(Number).indexOf(day) === -1) return;
-        tr.classList.add('today');
-        open = mins >= +tr.dataset.open && mins < +tr.dataset.close;
+      items.forEach(function (el) {
+        if (el.dataset.days.split(',').map(Number).indexOf(day) === -1) return;
+        el.classList.add('today');
+        if (mins >= Number(el.dataset.open) && mins < Number(el.dataset.close)) open = true;
       });
       status.textContent = open ? 'Aberto agora' : 'Fechado agora';
       status.classList.add(open ? 'open' : 'closed');
@@ -61,25 +77,32 @@
   var DURATION = 5000;   // tempo de cada slide (ms)
   var SNAP = 600;        // duração da animação (ms)
 
-  // Clones nas pontas para o loop infinito
+  // Clones nas pontas do slide para o loop infinito
   track.insertBefore(slides[N - 1].cloneNode(true), slides[0]);
   track.appendChild(slides[0].cloneNode(true));
 
   var pos = 1, width = viewport.clientWidth, dx = 0, startX = 0;
   var dragging = false, locked = false, hovering = false;
   var elapsed = 0, last = performance.now();
+  var tp = 0;                       // posição do "ponteiro" nas miniaturas
+  var stripAnim = false, stripRaf = 0;
+  var down = false, moved = false, sx = 0, sl = 0;
 
-  // Miniaturas
-  var thumbs = slides.map(function (s, i) {
-    var b = document.createElement('button');
-    b.className = 'thumb';
-    b.type = 'button';
-    b.setAttribute('aria-label', 'Ir para ' + s.dataset.title);
-    b.innerHTML = '<svg><use href="#i-photo"/></svg><span>' + s.dataset.title + '</span>';
-    b.addEventListener('click', function () { go(i + 1); });
-    strip.appendChild(b);
-    return b;
-  });
+  // Miniaturas: 3 cópias em anel (estilo relógio), a ativa fica na cópia do meio
+  var allThumbs = [];
+  for (var c = 0; c < 3; c++) {
+    slides.forEach(function (s, i) {
+      var b = document.createElement('button');
+      b.className = 'thumb';
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Ir para ' + s.dataset.title);
+      if (c !== 1) { b.tabIndex = -1; b.setAttribute('aria-hidden', 'true'); }
+      b.innerHTML = '<svg><use href="#i-photo"/></svg><span>' + s.dataset.title + '</span>';
+      b.addEventListener('click', function () { go(i + 1); });
+      strip.appendChild(b);
+      allThumbs.push(b);
+    });
+  }
 
   function realIndex() { return (pos - 1 + N) % N; }
 
@@ -88,26 +111,64 @@
     track.style.transform = 'translate3d(' + (-pos * width + dx) + 'px,0,0)';
   }
 
-  function updateThumbs() {
-    var idx = realIndex();
-    thumbs.forEach(function (t, i) { t.classList.toggle('active', i === idx); });
-    var a = thumbs[idx];
-    strip.scrollTo({ left: a.offsetLeft - (strip.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' });
+  function setActiveThumb() {
+    allThumbs.forEach(function (t) { t.classList.remove('active'); });
+    allThumbs[N + tp].classList.add('active');
   }
+
+  // Centraliza a miniatura ativa; sempre gira para frente, sem voltar
+  function centerStrip(animate) {
+    var el = allThumbs[N + tp];
+    var x = el.offsetLeft + el.offsetWidth / 2 - strip.clientWidth / 2;
+    cancelAnimationFrame(stripRaf);
+    if (!animate) { strip.scrollLeft = x; return; }
+    var from = strip.scrollLeft, t0 = performance.now();
+    (function step(t) {
+      var k = Math.min((t - t0) / SNAP, 1);
+      k = 1 - Math.pow(1 - k, 3);
+      strip.scrollLeft = from + (x - from) * k;
+      if (k < 1) stripRaf = requestAnimationFrame(step);
+    })(t0);
+  }
+
+  // Quando o usuário arrasta a fileira, reposiciona o anel sem salto visível
+  function wrap() {
+    if (stripAnim) return;
+    var w = allThumbs[N].offsetLeft - allThumbs[0].offsetLeft, shift = 0;
+    if (strip.scrollLeft < w * 0.5) shift = w;
+    else if (strip.scrollLeft > w * 1.5) shift = -w;
+    if (shift) { strip.scrollLeft += shift; if (down) sl += shift; }
+  }
+  strip.addEventListener('scroll', wrap, { passive: true });
 
   function go(target) {
     if (locked) return;
-    locked = true;
+    locked = true; stripAnim = true;
+    var prev = pos, cur = realIndex();
+    var instant = Math.abs(target - prev) > 1;   // clique numa miniatura distante: troca direta
+    var delta;
     pos = target;
+    if (instant) {
+      delta = (((realIndex() - cur) % N) + N) % N;
+      if (delta > N / 2) delta -= N;             // caminho mais curto no anel
+    } else {
+      delta = target - prev;                     // +1 vira o ponteiro para frente, mesmo da última para a primeira
+    }
+    tp += delta;
     dx = 0;
-    render(true);
-    updateThumbs();
+    render(!instant);
+    setActiveThumb();
+    centerStrip(true);
     elapsed = 0;
     bar.style.width = '0%';
     setTimeout(function () {
-      if (pos === 0) pos = N;            // salto invisível entre clone e slide real
+      if (pos === 0) pos = N;                    // salto invisível entre clone e slide real
       else if (pos === N + 1) pos = 1;
       render(false);
+      tp = ((tp % N) + N) % N;                   // volta para a cópia do meio (visual idêntico)
+      setActiveThumb();
+      centerStrip(false);
+      stripAnim = false;
       locked = false;
     }, SNAP + 30);
   }
@@ -141,9 +202,9 @@
     if (!dragging) return;
     dragging = false;
     viewport.classList.remove('dragging');
-    var moved = dx;
+    var m = dx;
     dx = 0;
-    if (Math.abs(moved) > width * 0.15) go(moved < 0 ? pos + 1 : pos - 1);
+    if (Math.abs(m) > width * 0.15) go(m < 0 ? pos + 1 : pos - 1);
     else render(true);
   }
   viewport.addEventListener('pointerup', endDrag);
@@ -157,11 +218,11 @@
   viewport.addEventListener('mouseenter', function () { hovering = true; });
   viewport.addEventListener('mouseleave', function () { hovering = false; });
 
-  // Arraste contínuo da fileira de miniaturas (mouse; no toque a rolagem é nativa)
-  var down = false, moved = false, sx = 0, sl = 0;
+  // Arraste da fileira de miniaturas com mouse (no toque a rolagem é nativa)
   strip.addEventListener('pointerdown', function (e) {
     if (e.pointerType !== 'mouse') return;
     down = true; moved = false; sx = e.clientX; sl = strip.scrollLeft;
+    cancelAnimationFrame(stripRaf);
   });
   window.addEventListener('pointermove', function (e) {
     if (!down) return;
@@ -174,9 +235,11 @@
     if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
   }, true);
 
-  window.addEventListener('resize', function () { width = viewport.clientWidth; render(false); });
+  window.addEventListener('resize', function () { width = viewport.clientWidth; render(false); centerStrip(false); });
+  window.addEventListener('load', function () { centerStrip(false); });
 
   render(false);
-  updateThumbs();
+  setActiveThumb();
+  centerStrip(false);
   requestAnimationFrame(function (t) { last = t; tick(t); });
 })();
