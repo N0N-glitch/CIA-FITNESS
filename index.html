@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cia Fitness | Academia em Jaru - RO</title>
   <meta name="description" content="Cia Fitness: 15 anos elevando o padrão do que é treinar. Musculação, judô e espaço kids em Jaru - RO.">
-  <meta name="theme-color" content="#0b0b0f">
+  <meta name="theme-color" content="#07070a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -37,6 +37,11 @@
       <a href="#modalidades">Modalidades</a>
       <a href="#contato">Contato</a>
       <a href="https://wa.me/5569999916656?text=Ol%C3%A1!%20Quero%20agendar%20uma%20aula%20experimental." class="btn btn--gold btn--sm" target="_blank" rel="noopener">Aula Experimental</a>
+      <div class="quick" aria-label="Atalhos">
+        <a class="qbtn" href="https://wa.me/5569999916656?text=Ol%C3%A1!%20Quero%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp"><svg><use href="#i-whats"/></svg></a>
+        <a class="qbtn" href="https://instagram.com/ciafitnessoficial" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><svg><use href="#i-insta"/></svg></a>
+        <a class="qbtn" href="https://www.google.com/maps/search/?api=1&amp;query=Av.+Dom+Pedro+I+3181+Jaru+RO" target="_blank" rel="noopener" aria-label="Google Maps" title="Google Maps"><svg><use href="#i-pin"/></svg></a>
+      </div>
     </nav>
     <button class="burger" id="burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
   </div>
@@ -114,24 +119,43 @@
       <div class="contact">
         <div class="board bracket">
           <div class="board__head"><h3>Horário de funcionamento</h3><span class="status" id="status">Verificando...</span></div>
-          <table class="hours" id="hours">
-            <tbody>
-              <tr data-days="1,2,3,4,5" data-open="300" data-close="1440"><th>Segunda a Sexta</th><td>05:00 - 00:00</td></tr>
-              <tr data-days="6" data-open="360" data-close="1200"><th>Sábado</th><td>06:00 - 20:00</td></tr>
-              <tr data-days="0" data-open="480" data-close="660"><th>Domingo</th><td>08:00 - 11:00</td></tr>
-            </tbody>
-          </table>
+          <div class="seg" id="seg" data-active="0" role="tablist" aria-label="Formato dos horários">
+            <span class="seg__thumb" aria-hidden="true"></span>
+            <button type="button" class="seg__btn active" role="tab" aria-selected="true" data-i="0">Visual Resumido</button>
+            <button type="button" class="seg__btn" role="tab" aria-selected="false" data-i="1">Tabela Completa</button>
+          </div>
+          <div class="view active" id="view0" role="tabpanel">
+            <ul class="slots">
+              <li data-days="1,2,3,4,5" data-open="300" data-close="1440"><span>Segunda a Sexta</span><strong>05:00 às 00:00</strong></li>
+              <li data-days="6" data-open="360" data-close="1200"><span>Sábado</span><strong>06:00 às 20:00</strong></li>
+              <li data-days="0" data-open="480" data-close="660"><span>Domingo</span><strong>08:00 às 11:00</strong></li>
+            </ul>
+          </div>
+          <div class="view" id="view1" role="tabpanel">
+            <table class="hours">
+              <thead><tr><th>Dia da Semana</th><th>Abre</th><th>Fecha</th></tr></thead>
+              <tbody>
+              <tr data-days="1" data-open="300" data-close="1440"><th>Segunda-feira</th><td>05:00</td><td>00:00</td></tr>
+              <tr data-days="2" data-open="300" data-close="1440"><th>Terça-feira</th><td>05:00</td><td>00:00</td></tr>
+              <tr data-days="3" data-open="300" data-close="1440"><th>Quarta-feira</th><td>05:00</td><td>00:00</td></tr>
+              <tr data-days="4" data-open="300" data-close="1440"><th>Quinta-feira</th><td>05:00</td><td>00:00</td></tr>
+              <tr data-days="5" data-open="300" data-close="1440"><th>Sexta-feira</th><td>05:00</td><td>00:00</td></tr>
+              <tr data-days="6" data-open="360" data-close="1200"><th>Sábado</th><td>06:00</td><td>20:00</td></tr>
+              <tr data-days="0" data-open="480" data-close="660"><th>Domingo</th><td>08:00</td><td>11:00</td></tr>
+              </tbody>
+            </table>
+          </div>
           <p class="board__note">Em feriados, confirme o horário pelo WhatsApp.</p>
         </div>
         <div class="board bracket">
           <ul class="info">
-            <li><svg><use href="#i-pin"/></svg><div><strong>Endereço</strong><span>Av. Dom Pedro I, 3181 - St. 5<br>Jaru - RO</span><a href="https://www.google.com/maps/search/?api=1&query=Av.+Dom+Pedro+I+3181+Jaru+RO" target="_blank" rel="noopener">Abrir no Google Maps</a></div></li>
+            <li><svg><use href="#i-pin"/></svg><div><strong>Endereço</strong><span>Av. Dom Pedro I, 3181 - St. 5<br>Jaru - RO</span></div></li>
             <li><svg><use href="#i-phone"/></svg><div><strong>Telefone</strong><a href="tel:+5569999916656">(69) 99991-6656</a></div></li>
-            <li><svg><use href="#i-insta"/></svg><div><strong>Instagram</strong><a href="https://instagram.com/ciafitnessoficial" target="_blank" rel="noopener">@ciafitnessoficial</a></div></li>
           </ul>
-          <div class="board__actions">
-            <a href="https://wa.me/5569999916656?text=Ol%C3%A1!%20Quero%20agendar%20uma%20aula%20experimental." class="btn btn--gold" target="_blank" rel="noopener">Chamar no WhatsApp</a>
-            <a href="tel:+5569999916656" class="btn btn--ghost">Ligar agora</a>
+          <div class="actions">
+            <a href="https://wa.me/5569999916656?text=Ol%C3%A1!%20Quero%20agendar%20uma%20aula%20experimental." class="btn btn--gold" target="_blank" rel="noopener"><svg><use href="#i-whats"/></svg>Chamar no WhatsApp</a>
+            <a href="https://instagram.com/ciafitnessoficial" class="btn btn--ghost" target="_blank" rel="noopener"><svg><use href="#i-insta"/></svg>@ciafitnessoficial</a>
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=Av.+Dom+Pedro+I+3181+Jaru+RO" class="btn btn--ghost" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg>Abrir no Google Maps</a>
           </div>
         </div>
       </div>
@@ -144,6 +168,7 @@
     <a href="#inicio" class="logo">CIA<b>FITNESS</b></a>
     <p>Av. Dom Pedro I, 3181 - St. 5, Jaru - RO</p>
     <div class="social">
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=Av.+Dom+Pedro+I+3181+Jaru+RO" target="_blank" rel="noopener" aria-label="Google Maps"><svg><use href="#i-pin"/></svg></a>
       <a href="https://instagram.com/ciafitnessoficial" target="_blank" rel="noopener" aria-label="Instagram"><svg><use href="#i-insta"/></svg></a>
       <a href="https://wa.me/5569999916656" target="_blank" rel="noopener" aria-label="WhatsApp"><svg><use href="#i-whats"/></svg></a>
     </div>
@@ -155,4 +180,4 @@
 
 <script src="script.js"></script>
 </body>
-                                                                                        </html>
+                                             </html>
